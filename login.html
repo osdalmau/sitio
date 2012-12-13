@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head><title>Login.php</title></head><body><?php /*Programa: Login.php
+* Descripcion: Aqui se registraran los clientes.
+*/
+session_start();
+include("base.inc");
+switch(@$_GET['do'])
+{
+case "registro":
+$conexion = mysql_connect($usuario,$usuario,$clave)
+or die("Nose pudo conectar al servidor.");
+$db = mysql_select_db($basededatos,$conexion)
+or die ("No se pudo seleccionar la base de datos.");
+$sql = "SELECT Nombreentrada FROM Miembro
+WHERE Nombreregistro= '$_POST[fnombreusuario]'";
+$resultado = mysql_query($sql)
+or die ("No se pudo ejecutar la consulta.");
+$num = mysql_num_rows($resultado);
+if($num == 1) //nombre de registro fue encontrado
+{
+$sql = "SELECT Nombreentrada FROM Miembro
+WHERE Nombreregistro= '$_POST[fnombreusuario]'
+AND clave=clave('$_POST[fclave]')";
+$result2 = mysql_query($sql)
+or die("No se pudo ejecutar la consulta 2.");
+$num2 = mysql_num_rows($result2);
+if ($num2 > 0)//clave correcta
+{
+$_SESSION['auth']= "si";
+$Nombreregistro=$_POST['fnombreusuario'];
+$_SESSION 'nombreregistro']=$nombreregistro;
+$hoy = date("A-m-d h:m:s);
+$sql = "INSERT INTO Registro
+(Nombreentrada,fechacreacion)
+VALORS ('$Nombreregistro','$hoy')";
+mysql_query ($sql) or die ("No se puede ejecutar la consulta.");
+header("Ubicacion: Member_page.php");
+}
+else //clave invalida
+{
+unset($do)
+$mensaje="El nombre de registro,
+'$_POST[fnombreusuario]'
+existe pero usted no ha digitado la clave correcta. Por favor intentelo de nuevo.<br>";
+include("login_form.inc");
+}
+}
+elseif ($num == 0) //nombre registro no found
+{
+unset($do);
+$mensaje = "El nombre de registro digitado no existe.
+Por favor, intentelo de nuevo.<br>";
+include("login_form.inc");
+}
+break;
+case "new"
+foreach($_POST as $campo => $valor)
+{
+if ($campo !="departamento")
+{
+if($valor=="")
+{
+unset($_GET['do']);
+$mensaje_nuevo = "Hace falta informacion obligatoria.
+Por favor,intentelo de nuevo.";
+include("login_form.inc");
+exit();
+}
+}
+if (ereg"(Nombre)",$campo))
+/*if (!ereg("^[A-Za-z' -]{1,50}$",$valor))
+{
+unset($_GET['do']);
+$mensaje_nuevo = $campo no es un nombre valido.
+Por favor,intentelo de nuevo.";
+include("login_form.inc");
+exit();
+}*/
+}
+$$campo = strp_tags(trim($valor));
+}//end foreach
+if(!ereg(("^[0-9]{5,5}(\-[0-9]{4,4}?$",%codigopostal))
+{
+unset($_GET['do']);
+$mensaje_nuevo = "$codigopostal no es un codigo postal valido. Por favor, intentelo de nuevo.";
+include("login_form.inc");
+exit();
+}
+if(!ereg(["^[0-9)(xX -]{7,20}$",%telefono))
+{
+unset(_GET['do']);
+$mensaje_nuevo = "$telefono no es un nuemero telefonico valid. Por favor,intentelo de nuevo.";
+include("login_form.inc");
+exit();
+}
+if($departamento != "")
+{
+if(!ereg(["^[0-9)(xX -]{7,20}$",%tdepartamento))
+{
+unset($_GET['do']);
+$mensaje_nuevo = "$departamento no valido. Porfavor, intentelo de nuevo.";
+include("login_form.inc");
+exit();
+}
+}
+if (!ereg("^.+@.+\\..+$,$email))
+{
+unset($_GET['do']);
+$mensaje_nuevo = "$email no es una direccion electronica valida. Porfavor, intentelo de nuevo.";
+include(login_form.inc");
+exit();
+}
+$conexion = mysql_connect($usuario,$usuario,$clave)
+or die("No se pudo conectar al servidor.");
+$db = mysql_select_db($basededatos,$conexion)
+or die("No se pudo seleccionar la base de datos.");
+$sql = "SELECT Nombreentrada FROM Miebro
+WHERE Nombreregistro = '$nombrenuevo'";
+$resultado = mysql_query($sql)
+or die("No se pudo ejecutar la consulta.");
+$num = mysql_numrows($resultado);
+if($num > 0)
+{
+unset($_GET['do']);
+$mensaje nuevo = "$nombrenuevo ya existe. Seleccione ota identificación de membresia."
+include("login_form.inc");
+exit();
+}
+else
+{
+$hoy = date("A-m-d");
+$sql = "INSERT INTO Miembro
+(Nombreregistro,Fechacreacion,
+clave,nombre,apellido,calle,ciudad,estado,codigopostal,telefono,departamento,email)VALORES
+('$nombrenuevo','$hoy',clave('$contranueva'),'$nombre','$apellido','$calle','$ciudad','$estado','$codigopostal',
+'$telefono','departamento','$email')";
+mysql_query(sql);
+$_SESSION ['auth']="si";
+$_SESSION ['Nombreregistro'] =$nombrenuevo;
+/*envia mensaje electronico al cliente*/
+$emess.= "Una nueva cuenta de membresia ha sido creada para uste.";
+$emess. = "Su identificacion de membresia y clave nuevas son:";
+$emess.="\n\n\t$nombrenuevo\n\t$contranueva\n\n";
+$emess.="Apreciamos su interes en nuestra pagina";
+$emess.="en paginaprueba.com.\n\n";
+$emess.="Si tiene preguntas o problemas.";
+$emess.="envie un mensaje a teffycor3@gmail.com";
+$ehead = "De: cliente-new@paginaprueba.com\r\n";
+$subj = "Su nueva cuenta de membresia";
+$mailsend = mail("$email","$subj","$emess","ehead");
+header("ubicacion: New_member.php");
+}
+break;
+default:
+include("login_form.inc");
+}
+?></body></html>
